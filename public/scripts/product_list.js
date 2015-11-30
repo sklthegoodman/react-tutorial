@@ -22,7 +22,7 @@ var ProductRow = React.createClass({
   render:function(){
     var name = this.props.product.stocked ?
       this.props.product.name :
-      <span style={{colorL:'red'}}>
+      <span style={{color:'red'}}>
         {this.props.product.name}
       </span>;
     return (
@@ -56,12 +56,17 @@ var ProductTable = React.createClass({
   }
 });
 var SearchBar = React.createClass({
+  handleClick:function(){
+    var checkbox = document.getElementById('checkBox');
+    var checked = checkbox.checked;
+    this.props.onchange(checked);
+  },
   render:function(){
     return(
       <form>
         <input type="text" placeholder="please enter some information" />
         <p>
-          <input type="checkbox"/>
+          <input type="checkbox" id="checkBox" onClick={this.handleClick}/>
           {' '}
           Only show product in stock
         </p>
@@ -70,11 +75,33 @@ var SearchBar = React.createClass({
   }
 });
 var FilterableProductTable = React.createClass({
+  changeHandle:function(checked){
+    if(checked){
+      var products = [];
+      this.props.products.forEach(function(product){
+        if(product.stocked){
+          products.push(product);
+        }
+      });
+      this.setState({
+        products:products
+      });
+    }else{
+      this.setState({
+        products:this.props.products
+      });
+    }
+  },
+  getInitialState:function(){
+    return {
+      products:this.props.products
+    }
+  },
   render: function() {
     return (
       <div>
-        <SearchBar />
-        <ProductTable products={this.props.products} />
+        <SearchBar onchange={this.changeHandle}/>
+        <ProductTable products={this.state.products} />
       </div>
     );
   }
